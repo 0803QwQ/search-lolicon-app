@@ -1,9 +1,10 @@
 <?php
 $setLicense = '';//自定义内部许可码
-$setProxy = 'pixiv.hixm.workers.dev';//自定义Pixiv反代地址，默认为i.pximg.net(注意这个地址被墙了)
+$setProxy = 'i.pixiv.re';//自定义Pixiv反代地址，默认为i.pximg.net(注意这个地址被墙了)
 $setSize = 'regular';//自定义图片大小，默认为original，可以使用这些参数：original/regular/small/thumb/mini
 $setShowTags = 3;//自定义显示的Tag数量，0为不限制，默认为0
 $setMaxNumber = 10;//自定义输出的最多图片数量，最大为100，必须设置
+$setBackground = 'https://iw233.cn/api/Random.php';//自定义背景图片，可以设置为任意图片或随机图片的API，默认无背景
 $virefyR18 = true;//设置是否在搜索R18内容时要求年龄高于18岁
 
 function post($data){
@@ -25,7 +26,7 @@ function htmlHeader($keyword, $page, $over18){
     }else{
         $note = "input[type='{$page}'],#btn1,#btn2{box-sizing:border-box;text-align:center;font-size:1.4em;height:2.7em;border-radius:4px;border:1px solid #c8cccf;color:#6a6f77;-web-kit-appearance:none;-moz-appearance:none;display:block;outline:0;padding:0 1em;text-decoration:none;width:100%;}input[type='{$page}']:focus{border:1px solid #ff7496;}input[type='number']:focus{border:1px solid #ff7496;}input[type='submit']{width:360px;margin:20px auto;height:40px;border-width:0px;border-radius:3px;background:#1E90FF;cursor:pointer;outline:none;font-family:Microsoft YaHei;color:white;font-size:17px;-webkit-appearance:none;}input[type='submit']:hover{background:#5599FF;-webkit-appearance:none;}::-moz-placeholder {color:#6a6f77;}::-moz-placeholder{color:#6a6f77;}input::-webkit-input-placeholder{color:#6a6f77;}.notice{margin:10%auto0;background-color:rgba(255, 255, 255, 0.8);padding:2%5%}p{line-height:2}</style></head><body><div id='overlay' class='overlay'><div class='text-bg'><div class='input_control'><h3><form action='#' method='post'><input type='asked' name='asked' value='true' style='display:none'><input type='over18' name='over18' value='{$over18}' style='display:none'>";
     };
-    return("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0{$title}</title><style>.overlay{z-index:2;display:flex;align-items:center;justify-content:center;background-image:url(https://iw233.cn/api/Random.php);background-repeat:no-repeat;background-size:cover;background-position:center 0;}.text-bg{background-color:rgba(255, 255, 255, 0.6);padding:24px;}.input_control{width:360px;margin:20px auto;}{$note}");
+    return("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0{$title}</title><script>(new Image).src='{$setBackground}';</script><style>.overlay{z-index:2;display:flex;align-items:center;justify-content:center;background-image:url({$setBackground});background-repeat:no-repeat;background-size:cover;background-position:center 0;}.text-bg{background-color:rgba(255, 255, 255, 0.6);padding:24px;}.input_control{width:360px;margin:20px auto;}{$note}");
 };
 
 $asked = (bool)$_POST['asked'];
