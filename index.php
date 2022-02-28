@@ -4,7 +4,6 @@ $setProxy = 'i.pixiv.re';//自定义Pixiv反代地址，默认为i.pximg.net(注
 $setSize = 'regular';//自定义图片大小，默认为original，可以使用这些参数：original/regular/small/thumb/mini
 $setShowTags = 3;//自定义显示的Tag数量，0为不限制，默认为0
 $setMaxNumber = 10;//自定义输出的最多图片数量，最大为100，必须设置
-$virefyR18 = false;//设置是否在搜索R18内容时要求年龄高于18岁
 
 function post($data){
     $ch = curl_init();
