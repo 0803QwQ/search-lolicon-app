@@ -68,6 +68,7 @@ if (!$asked){
         $array = post(json_encode($data))['data'];
         $r18X = "r18Check".$r18;
         $$r18X = "checked='checked' ";
+        if ($over18 == 1 || $virefyR18 == false) $chooseR18 = "<br>全年龄<input id='radio' type='radio' {$r18Check0}name='r18' value='0'>&emsp;&emsp;R18<input id='radio' type='radio' {$r18Check1}name='r18' value='1'>&emsp;&emsp;随机<input id='radio' type='radio' {$r18Check2}name='r18' value='2'>";
         if ($array == array()){
             $setuHtml = "<div class='notice'><p>标题：NULL<br>画师：NULL<br>PID：NULL<br>是否为R18图：NULL<br>图片Tag：NULL<br></p><p>404 Not Found</p></div><br>";
         }else{
@@ -88,7 +89,6 @@ if (!$asked){
                 };
                 $setuHtml = $setuHtml."<div class='notice'><p>{$setuTitle}{$setuMode}<br>{$setuTag}<br></p><img src='{$setuURL}' width='100%'/></div><br>";
             };
-            if ($over18 == 1 || $virefyR18 == false) $chooseR18 = "<br>全年龄<input id='radio' type='radio' {$r18Check0}name='r18' value='0'>&emsp;&emsp;R18<input id='radio' type='radio' {$r18Check1}name='r18' value='1'>&emsp;&emsp;随机<input id='radio' type='radio' {$r18Check2}name='r18' value='2'>";
         };
         $return = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'>{$chooseR18}<br>获取图片数量(1-{$setMaxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$setMaxNumber}' />张<input id='submit' type='submit' value='立即搜索',name='submit'></form>{$setuHtml}</h3></div></div></div></body><html>";
     }else{
