@@ -18,7 +18,7 @@ function post($data){
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     $result = curl_exec($ch);
     curl_close($ch);
-    return json_decode($result, true);
+    return(json_decode($result, true));
 };
 
 function htmlHeader($page){
