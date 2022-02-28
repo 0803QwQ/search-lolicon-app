@@ -75,7 +75,7 @@ if (!$asked){
                 if ($number != 1) $setuNum = "【".($setuKey + 1)."】";
                 $setuURL = $setuArray['urls'][$setSize];
                 $setuTitle = "标题{$setuNum}：".$setuArray['title']."<br>画师：".$setuArray['author']."(".$setuArray['uid'].")<br>PID：".$setuArray['pid'];
-                if ($over18 == 1) $setuMode = "<br>是否为R18图：".var_export($setuArray['r18'], true);
+                if ($over18 == 1 || $virefyR18 == false) $setuMode = "<br>是否为R18图：".var_export($setuArray['r18'], true);
                 $setuTag = "图片Tag：";
                 foreach ($setuArray['tags'] as $key => $value){
                     if ($setShowTags == 0) $setShowTags = count($setuArray['tags']);
