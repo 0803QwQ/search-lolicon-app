@@ -4,11 +4,11 @@ $setProxy = 'i.pixiv.re';//自定义Pixiv反代地址，默认为i.pximg.net(注
 $setSize = 'regular';//自定义图片大小，默认为original，可以使用这些参数：original/regular/small/thumb/mini
 $setShowTags = 3;//自定义显示的Tag数量，0为不限制，默认为0
 $maxNumber = 10;//自定义输出的最多图片数量，最大为100，必须设置
+$virefyR18 = true;//设置是否在搜索R18内容时要求年龄高于18岁
+$hideR18 = false;//设置是否隐藏R18内容，注意设置此项后$virefyR18变量将无效
 $htmlBackground = 'https://iw233.cn/api/Random.php';//自定义背景图片，可以设置为任意图片或随机图片的API，默认无背景
 $htmlBgBlur = 5;//自定义背景高斯模糊，单位px
 $htmlBgOpacity = 0.9;//自定义背景透明度，区间为0-1，0为完全透明，1为完全不透明
-$virefyR18 = true;//设置是否在搜索R18内容时要求年龄高于18岁
-$hideR18 = false;//设置是否隐藏R18内容，注意设置此项后$virefyR18变量将无效
 $htmlIcon = './icon.ico';//自定义网站的图标
 
 function post($data){
