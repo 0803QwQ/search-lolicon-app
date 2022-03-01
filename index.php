@@ -40,7 +40,7 @@ $r18 = intval($_POST['r18']);
 $number = intval($_POST['number']);
 if ($hideR18 == true) $over18 = -1;else $over18 = intval($_POST['over18']);
 foreach ($_GET as $setKey => $setValue){
-    if ($setKey == "License") exit(print_r("403 Forbidden"));
+    if ($setKey == "License") return(print_r("403 Forbidden!"));
     $userSetting = "set".$setKey;
     $$userSetting = $setValue;
 };
