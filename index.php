@@ -1,6 +1,6 @@
 <?php
 $setLicense = '';//自定义内部许可码
-$setProxy = 'i.pixiv.re';//自定义Pixiv反代地址，默认为i.pximg.net(注意这个地址被墙了)
+$setProxy = 'pixiv.hixm.workers.dev';//自定义Pixiv反代地址，默认为i.pximg.net(注意这个地址被墙了)
 $setSize = 'regular';//自定义图片大小，默认为original，可以使用这些参数：original/regular/small/thumb/mini
 $setShowTags = 3;//自定义显示的Tag数量，0为不限制，默认为0
 $setMaxNumber = 10;//自定义输出的最多图片数量，最大为100，必须设置
@@ -8,6 +8,8 @@ $setBackground = 'https://iw233.cn/api/Random.php';//自定义背景图片，可
 $setBgBlur = 5;//自定义背景高斯模糊，单位px
 $setBgOpacity = 0.9;//自定义背景透明度，区间为0-1，0为完全透明，1为完全不透明
 $virefyR18 = true;//设置是否在搜索R18内容时要求年龄高于18岁
+$hideR18 = false;//设置是否隐藏R18内容，注意设置此项后$virefyR18变量将无效
+$htmlIcon = './icon.ico';//自定义网站的图标
 
 function post($data){
     $ch = curl_init();
@@ -20,24 +22,22 @@ function post($data){
     curl_close($ch);
     return(json_decode($result, true));
 };
-
 function htmlHeader($page){
-    global $keyword, $over18, $setBackground, $setBgBlur, $setBgOpacity;
+    global $keyword, $over18, $setBackground, $setBgBlur, $setBgOpacity, $htmlIcon;
     if ($keyword != null) $title = " | \"{$keyword}\"的搜索结果";
     if ($page == "verifyR18"){
         $note = "p{margin:0;}*,*::before,*::after{box-sizing:border-box;}.overlay,.scare{position:fixed;top:0;left:0;height:100vh;width:100vw;}p.overlay-title{font-size:24px;font-weight:900;color:black;line-height:1;margin-bottom:16px;}.overlay-button{display:inline-flex;align-items:center;height:40px;padding-right:24px;padding-left:24px;font-size:16px;font-weight:500;line-height:1;border-radius:4px;margin:4px;cursor:pointer;}.overlay-buttons-wrapper{margin:24px -8px -8px;}#accept-button{background-color:rgb(255, 0, 0);color:white;}#decline-button{color:rgb(0, 0, 0);border:2px solid rgb(0, 0, 0);}p.overlay-description{font-size:16px;font-weight:400;color:rgba(0, 0, 0, 0.5);line-height:1.25;margin-bottom:16px;}a.overlay-link{display:inline-block;text-decoration:none;font-size:16px;font-weight:500;color:rgb(255, 0, 0);line-height:1;position:relative;margin-top:16px;}a.overlay-link::before{position:absolute;content:'';height:calc(50% + 4px);width:calc(100% + 8px);bottom:-4px;left:-4px;background-color:rgba(132, 94, 194, 0.1);}.overlay-body{max-width:512px;text-align:center;font-family:'Inter', sans-serif;}";
     }else{
         $note = "input[id='{$page}'],#btn1,#btn2{box-sizing:border-box;text-align:center;font-size:1.4em;height:2.7em;border-radius:4px;border:1px solid #c8cccf;color:#6a6f77;-web-kit-appearance:none;-moz-appearance:none;display:block;outline:0;padding:0 1em;text-decoration:none;width:100%;}input[id='{$page}']:focus{border:1px solid #ff7496;}input[id='number']:focus{border:1px solid #ff7496;}input[id='submit']{width:360px;margin:20px auto;height:40px;border-width:0px;border-radius:3px;background:#1E90FF;cursor:pointer;outline:none;font-family:Microsoft YaHei;color:white;font-size:17px;-webkit-appearance:none;}input[id='submit']:hover{background:#5599FF;-webkit-appearance:none;}::-moz-placeholder {color:#6a6f77;}::-moz-placeholder{color:#6a6f77;}input::-webkit-input-placeholder{color:#6a6f77;}.notice{margin:10%auto0;background-color:rgba(245, 245, 245, 0.8);padding:2%5%}p{line-height:2}</style></head><body><div id='overlay' class='overlay'><div class='text-bg'><div class='input_control'><h3><form action='#' method='post'><input type='asked' name='asked' value='true' style='display:none'><input type='over18' name='over18' value='{$over18}' style='display:none'>";
     };
-    return("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0{$title}</title><script>(new Image).src='{$setBackground}';</script><style>.overlay{z-index:2;display:flex;align-items:center;justify-content:center;}.overlay:before{background:url({$setBackground}) no-repeat;background-size:cover;background-position:center 0;width:100%;height:100%;content:\"\";position:absolute;top:0;left:0;z-index:-1;-webkit-filter:blur(3px);filter:blur({$setBgBlur}px);opacity:{$setBgOpacity};margin:0;padding:0;position:fixed;}.text-bg{background-color:rgba(255, 255, 255, 0.6);padding:24px;}.input_control{width:360px;margin:20px auto;}{$note}");
+    return("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0{$title}</title><link rel='Shortcut Icon' href='{$htmlIcon}' type='image/x-icon' /><script>(new Image).src='{$setBackground}';</script><style>.overlay{z-index:2;display:flex;align-items:center;justify-content:center;}.overlay:before{background:url({$setBackground}) no-repeat;background-size:cover;background-position:center 0;width:100%;height:100%;content:\"\";position:absolute;top:0;left:0;z-index:-1;-webkit-filter:blur(3px);filter:blur({$setBgBlur}px);opacity:{$setBgOpacity};margin:0;padding:0;position:fixed;}.text-bg{background-color:rgba(255, 255, 255, 0.6);padding:24px;}.input_control{width:360px;margin:20px auto;}{$note}");
 };
-
 $asked = (bool)$_POST['asked'];
 $keyword = strval($_POST['keyword']);
 $license = strval($_POST['license']);
-$over18 = intval($_POST['over18']);
 $r18 = intval($_POST['r18']);
 $number = intval($_POST['number']);
+if ($hideR18 == true) $over18 = -1;else $over18 = intval($_POST['over18']);
 if (!$asked){
     if ($virefyR18 == true && !$over18){
         $return = htmlHeader("verifyR18")."</style></head><body><div id='overlay' class='overlay'><div class='text-bg'><div class='overlay-body'><p class='overlay-title'>您是否已满18岁?</p><p class='overlay-description'>以下部分内容可能不适合<b>未满18岁</b>的人群查看，我们需要确认您的年龄以便于隐藏相关内容。</p><p class='overlay-description'>The following sections may not be suitable for people <b>under the age of 18</b>, and we need to confirm your age to make it easier to hide the content.</p><div class='overlay-buttons-wrapper'><form action='#' method='post'><button id='accept-button' class='overlay-button' name='over18' value='1'>已满18岁</button></form><form action='#' method='post'><button id='decline-button' class='overlay-button' name='over18' value='-1'>未满18岁</button></form></div></div></div></div></body></html>";
