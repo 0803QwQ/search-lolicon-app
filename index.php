@@ -1,6 +1,6 @@
 <?php
 $setLicense = '';//自定义内部许可码
-$setProxy = 'pixiv.hixm.workers.dev';//自定义Pixiv反代地址，默认为i.pximg.net(注意这个地址被墙了)
+$setProxy = 'i.pixiv.re';//自定义Pixiv反代地址，默认为i.pximg.net(注意这个地址被墙了)
 $setSize = 'regular';//自定义图片大小，默认为original，可以使用这些参数：original/regular/small/thumb/mini
 $setShowTags = 3;//自定义显示的Tag数量，0为不限制，默认为0
 $setMaxNumber = 10;//自定义输出的最多图片数量，最大为100，必须设置
