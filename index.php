@@ -22,7 +22,6 @@ function post($data){
     curl_close($ch);
     return(json_decode($result, true));
 };
-
 function htmlHeader($page){
     global $keyword, $over18, $htmlBackground, $htmlBgBlur, $htmlBgOpacity, $htmlIcon;
     if ($keyword != null) $title = " | \"{$keyword}\"的搜索结果";
@@ -33,20 +32,26 @@ function htmlHeader($page){
     };
     return("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0{$title}</title><link href='{$htmlIcon}' rel='icon' type='image/x-icon' /><script>(new Image).src='{$htmlBackground}';</script><style>.overlay{z-index:2;display:flex;align-items:center;justify-content:center;}.overlay:before{background:url({$htmlBackground}) no-repeat;background-size:cover;background-position:center 0;width:100%;height:100%;content:\"\";position:absolute;top:0;left:0;z-index:-1;-webkit-filter:blur(3px);filter:blur({$htmlBgBlur}px);opacity:{$htmlBgOpacity};margin:0;padding:0;position:fixed;}.text-bg{background-color:rgba(255, 255, 255, 0.6);padding:24px;}.input_control{width:360px;margin:20px auto;}{$note}");
 };
-
 $asked = (bool)$_POST['asked'];
 $keyword = strval($_POST['keyword']);
 $license = strval($_POST['license']);
 $r18 = intval($_POST['r18']);
 $number = intval($_POST['number']);
-if ($hideR18 == true) $over18 = -1;else $over18 = intval($_POST['over18']);
+if ($hideR18 == true){
+    $over18 = -1;
+}else{
+    $over18 = intval($_POST['over18']);
+};
 $setBefore = ['license', 'proxy', 'size', 'showtags'];
 $setAfter = ['License', 'Proxy', 'Size', 'ShowTags'];
 foreach ($_GET as $setKey => $setValue){
     foreach ($setBefore as $key => $value) $setKey = str_replace($value, $setAfter[$key], $setKey);
-    if ($setKey == "License") $license = $setValue;
-    $userSetting = "set".$setKey;
-    $$userSetting = strval($setValue);
+    if ($setKey == "License"){
+        $license = $setValue;
+    }else{
+        $userSetting = "set".$setKey;
+        $$userSetting = strval($setValue);
+    };
 };
 if (!$asked){
     if ($virefyR18 == true && !$over18){
@@ -103,7 +108,7 @@ if (!$asked){
         };
         $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'>{$chooseR18}<br>获取图片数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张<input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div></body><html>";
     }else{
-        $htmlDoc = "<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url=#'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title></head><body><script>alert('警告：内部许可码错误！');</script></body></html>";
+        $htmlDoc = "<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url='><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title></head><body><script>alert('警告：内部许可码错误！');</script></body></html>";
     };
 };
 return(print_r($htmlDoc));
