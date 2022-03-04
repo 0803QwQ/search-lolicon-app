@@ -4,12 +4,13 @@ $setProxy = 'i.pixiv.re';//自定义Pixiv反代地址，默认为i.pximg.net(注
 $setSize = 'regular';//自定义图片大小，默认为original，可以使用这些参数：original/regular/small/thumb/mini
 $setShowTags = 3;//自定义显示的Tag数量，0为不限制，默认为0
 $maxNumber = 10;//自定义输出的最多图片数量，最大为100，必须设置
-$virefyR18 = true;//设置是否在搜索R18内容时要求年龄高于18岁
-$hideR18 = false;//设置是否隐藏R18内容，注意设置此项后$virefyR18变量将无效
+$verifyR18 = true;//设置是否在搜索R18内容时要求年龄高于18岁
+$hideR18 = false;//设置是否隐藏R18内容，注意设置此项后$verifyR18变量将无效
 $htmlBackground = 'https://iw233.cn/api/Random.php';//自定义背景图片，可以设置为任意图片或随机图片的API，默认无背景
 $htmlBgBlur = 5;//自定义背景高斯模糊，单位px
 $htmlBgOpacity = 0.9;//自定义背景透明度，区间为0-1，0为完全透明，1为完全不透明
 $htmlIcon = './icon.ico';//自定义网站的图标
+$allowIP = [];//限制可以访问的IP，若填写该项，将只有被允许的IP能够访问此页面
 
 function post($data){
     $ch = curl_init();
@@ -22,6 +23,7 @@ function post($data){
     curl_close($ch);
     return(json_decode($result, true));
 };
+
 function htmlHeader($page){
     global $keyword, $over18, $htmlBackground, $htmlBgBlur, $htmlBgOpacity, $htmlIcon;
     if ($keyword != null) $title = " | \"{$keyword}\"的搜索结果";
@@ -32,6 +34,12 @@ function htmlHeader($page){
     };
     return("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0{$title}</title><link href='{$htmlIcon}' rel='icon' type='image/x-icon' /><script>(new Image).src='{$htmlBackground}';</script><style>.overlay{z-index:2;display:flex;align-items:center;justify-content:center;}.overlay:before{background:url({$htmlBackground}) no-repeat;background-size:cover;background-position:center 0;width:100%;height:100%;content:\"\";position:absolute;top:0;left:0;z-index:-1;-webkit-filter:blur(3px);filter:blur({$htmlBgBlur}px);opacity:{$htmlBgOpacity};margin:0;padding:0;position:fixed;}.text-bg{background-color:rgba(255, 255, 255, 0.6);padding:24px;}.input_control{width:360px;margin:20px auto;}{$note}");
 };
+
+function htmlAlert($info){
+    print_r("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url='><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title></head><body><script>alert('{$info}');</script></body></html>");
+    exit;
+};
+
 $asked = (bool)$_POST['asked'];
 $keyword = strval($_POST['keyword']);
 $license = strval($_POST['license']);
@@ -53,12 +61,16 @@ foreach ($_GET as $setKey => $setValue){
         $$userSetting = strval($setValue);
     };
 };
+if ($allowIP != array() && !in_array($_SERVER['REMOTE_ADDR'], $allowIP)){
+    htmlAlert("警告：访问IP未经授权！");
+};
 if (!$asked){
-    if ($virefyR18 == true && !$over18){
+    if ($verifyR18 == true && !$over18){
         $htmlDoc = htmlHeader("verifyR18");
     }else{
         if ($_GET == array()) $help = "网址示例：【<span id='here'></span>?Size=original&ShowTags=0】";
-        $htmlDoc = htmlHeader("license")."<input id='license' type='password' name='license' placeholder='请输入内部许可码'><input id='submit' type='submit' value='Link Start !',name='submit'></form></h3><div class='notice'><p><b>欢迎使用Lolicon.App涩图检索工具2.0！</b></p><p>请阅读以下说明:</p><p>搜索时支持AND和OR规则，方法如下:</p><p>1.你可以使用逗号【,】来获取包含特定多个tag的涩图(最多3个)，如【可莉,白丝】</p><p>2.你可以使用分割符【|】来获取包含任意一个tag的涩图(最多20个)，如【黑丝|白丝|萝莉】</p>3.你可以两者混用，如【可莉,黑丝|白丝】</p><p>4.如果你只搜索一个关键词，网站将会在标题/Tag/画师中进行模糊搜索</p><p>5.网站也支持搜索特定画师的涩图，你可以使用类似如下语句【UID:画师ID】进行搜索(注意这种搜索方式不能包含其他关键词)</p><p>6.规则语句会被自动修正，所以您同样可以使用中文标点，如【可莉，兽耳｜泳装】</p><p>7.网站支持一次性获取最多{$maxNumber}张图片，请冲的稍微节制一些(doge)</p><p>8.网站支持添加以下GET参数：<ul><li>Proxy：Pixiv反代地址</li><li>Size：图片大小，你可以使用值\"original\"以获取原图</li><li>ShowTags：显示tag数量，你可以使用值\"0\"以获取全部Tag</li></ul>{$help}</p><p>目前可以透露的情报：</p><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=f973f61b-912b-4dd6-b00a-f9c52db92918&amp;attribution=false'></iframe><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=b23a40a5-8c50-48ae-a950-95c81f9b013c&amp;attribution=false'></iframe><p>注：R18作品占比约为25%</p></div></div></div><script>document.getElementById(\"here\").innerHTML = window.location.href;</script></body></html>";
+        if ($over18 != -1 || $verifyR18 == false) $R18Info = "<p>注：R18作品占比约为25%</p>";
+        $htmlDoc = htmlHeader("license")."<input id='license' type='password' name='license' placeholder='请输入内部许可码'><input id='submit' type='submit' value='Link Start !',name='submit'></form></h3><div class='notice'><p><b>欢迎使用Lolicon.App涩图检索工具2.0！</b></p><p>请阅读以下说明:</p><p>搜索时支持AND和OR规则，方法如下:</p><p>1.你可以使用逗号【,】来获取包含特定多个tag的涩图(最多3个)，如【可莉,白丝】</p><p>2.你可以使用分割符【|】来获取包含任意一个tag的涩图(最多20个)，如【黑丝|白丝|萝莉】</p>3.你可以两者混用，如【可莉,黑丝|白丝】</p><p>4.如果你只搜索一个关键词，网站将会在标题/Tag/画师中进行模糊搜索</p><p>5.网站也支持搜索特定画师的涩图，你可以使用类似如下语句【UID:画师ID】进行搜索(注意这种搜索方式不能包含其他关键词)</p><p>6.规则语句会被自动修正，所以您同样可以使用中文标点，如【可莉，兽耳｜泳装】</p><p>7.网站支持一次性获取最多{$maxNumber}张图片，请冲的稍微节制一些(doge)</p><p>8.网站支持添加以下GET参数：<ul><li>Proxy：Pixiv反代地址</li><li>Size：图片大小，你可以使用值\"original\"以获取原图</li><li>ShowTags：显示tag数量，你可以使用值\"0\"以获取全部Tag</li></ul>{$help}</p><p>目前可以透露的情报：</p><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=f973f61b-912b-4dd6-b00a-f9c52db92918&amp;attribution=false'></iframe><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=b23a40a5-8c50-48ae-a950-95c81f9b013c&amp;attribution=false'></iframe>{$R18Info}</div></div></div><script>document.getElementById(\"here\").innerHTML = window.location.href;</script></body></html>";
     };
 }else{
     if ($license == $setLicense){
@@ -84,7 +96,7 @@ if (!$asked){
         $array = post(json_encode($data))['data'];
         $r18X = "r18Check".$r18;
         $$r18X = "checked='checked' ";
-        if ($over18 == 1 || $virefyR18 == false) $chooseR18 = "<br>全年龄<input id='radio' type='radio' {$r18Check0}name='r18' value='0'>&emsp;&emsp;R18<input id='radio' type='radio' {$r18Check1}name='r18' value='1'>&emsp;&emsp;随机<input id='radio' type='radio' {$r18Check2}name='r18' value='2'>";
+        if ($over18 != -1 || $verifyR18 == false) $chooseR18 = "<br>全年龄<input id='radio' type='radio' {$r18Check0}name='r18' value='0'>&emsp;&emsp;R18<input id='radio' type='radio' {$r18Check1}name='r18' value='1'>&emsp;&emsp;随机<input id='radio' type='radio' {$r18Check2}name='r18' value='2'>";
         if ($array == array()){
             $htmlSetu = "<div class='notice'><p>标题：NULL<br>画师：NULL<br>PID：NULL<br>是否为R18图：NULL<br>图片Tag：NULL<br></p><p>404 Not Found</p></div><br>";
         }else{
@@ -92,7 +104,7 @@ if (!$asked){
                 if ($number != 1) $setuNum = "【".($setuKey + 1)."】";
                 $setuURL = $setuArray['urls'][$setSize];
                 $setuTitle = "标题{$setuNum}：".$setuArray['title']."<br>画师：".$setuArray['author']."(".$setuArray['uid'].")<br>PID：".$setuArray['pid'];
-                if ($over18 == 1 || $virefyR18 == false) $setuMode = "<br>是否为R18图：".var_export($setuArray['r18'], true);
+                if ($over18 != -1 || $verifyR18 == false) $setuMode = "<br>是否为R18图：".var_export($setuArray['r18'], true);
                 $setuTag = "图片Tag：";
                 foreach ($setuArray['tags'] as $key => $value){
                     if ($setShowTags == 0) $setShowTags = count($setuArray['tags']);
@@ -108,8 +120,9 @@ if (!$asked){
         };
         $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'>{$chooseR18}<br>获取图片数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张<input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div></body><html>";
     }else{
-        $htmlDoc = "<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url='><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title></head><body><script>alert('警告：内部许可码错误！');</script></body></html>";
+        htmlAlert("警告：内部许可码错误！");
     };
 };
-return(print_r($htmlDoc));
+print_r($htmlDoc);
+exit;
 ?>
