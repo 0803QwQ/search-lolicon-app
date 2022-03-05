@@ -134,7 +134,7 @@ if (!$asked){
             foreach ($array as $setuKey => $setuArray){
                 if ($number != 1) $setuNum = "【".($setuKey + 1)."】";
                 $setuURL = $setuArray['urls'][$setSize];
-                $setuTitle = "标题{$setuNum}：".$setuArray['title']."<br>画师：".$setuArray['author']."(".$setuArray['uid'].")<br>PID：".$setuArray['pid']."(第".($setuArray['p'] + 1)."页)";
+                $setuTitle = "标题{$setuNum}：".$setuArray['title']."<br>画师：".$setuArray['author']."(".$setuArray['uid'].")<br>PID：".$setuArray['pid']."(第".$setuArray['p']."页)";
                 $setuDownload = urlencode(json_encode(['pid' => $setuArray['pid'], 'p' => $setuArray['p'] + 1]));
                 if ($over18 != -1 || $verifyR18 == false) $setuMode = "<br>是否为R18图：".var_export($setuArray['r18'], true);
                 $setuTag = "图片Tag：";
