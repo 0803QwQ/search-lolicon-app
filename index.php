@@ -44,7 +44,6 @@ function setuGet($pid, $p){
             if ($fileType == 'gif'){
                 $pid = "NULL";
                 $p = "NULL";
-                $url = "NULL";
             };
             continue;
         };
@@ -72,8 +71,8 @@ if ($_GET['download'] != null){
     readfile($setuGet['url']);
     exit;
 };
-$setBefore = ['license', 'proxy', 'size', 'showtags'];
-$setAfter = ['License', 'Proxy', 'Size', 'ShowTags'];
+$setBefore = ['license', 'proxy','pixivapi', 'size', 'showtags'];
+$setAfter = ['License', 'Proxy','PixivAPI', 'Size', 'ShowTags'];
 foreach ($_GET as $setKey => $setValue){
     foreach ($setBefore as $key => $value) $setKey = str_replace($value, $setAfter[$key], $setKey);
     if ($setKey == "License"){
@@ -83,78 +82,79 @@ foreach ($_GET as $setKey => $setValue){
         $$userSetting = strval($setValue);
     };
 };
-if ($allowIP != array() && !in_array($_SERVER['REMOTE_ADDR'], $allowIP)){
-    htmlAlert("警告：访问IP未经授权！");
-};
+if ($allowIP != array() && !in_array($_SERVER['REMOTE_ADDR'], $allowIP)) htmlAlert("警告：访问IP未经授权！");
 if (!$asked){
     if ($verifyR18 == true && !$over18){
         $htmlDoc = htmlHeader("verifyR18");
     }else{
         if ($_GET == array()) $help = "网址示例：【<span id='here'></span>?Size=original&ShowTags=0】";
-        if ($over18 != -1 || $verifyR18 == false) $R18Info = "<p>注：R18作品占比约为25%</p>";
+        if ($over18 != -1) $R18Info = "<p>注：R18作品占比约为25%</p>";
         $htmlDoc = htmlHeader("license")."<input id='license' type='password' name='license' placeholder='请输入内部许可码'><input id='submit' type='submit' value='Link Start !',name='submit'></form></h3><div class='notice'><p><b>欢迎使用Lolicon.App涩图检索工具2.0！</b></p><p>请阅读以下说明:</p><p>搜索时支持AND和OR规则，方法如下:</p><p>1.你可以使用逗号【,】来获取包含特定多个tag的涩图(最多3个)，如【可莉,白丝】</p><p>2.你可以使用分割符【|】来获取包含任意一个tag的涩图(最多20个)，如【黑丝|白丝|萝莉】</p>3.你可以两者混用，如【可莉,黑丝|白丝】</p><p>4.如果你只搜索一个关键词，网站将会在标题/Tag/画师中进行模糊搜索</p><p>5.网站也支持搜索特定画师的涩图，你可以使用类似如下语句【UID:画师UID】进行搜索(注意这种搜索方式不能包含其他关键词)</p><p>6.在此之外，网站也支持通过PID获取任意Pixiv图片原图，你可以使用类似如下语句【PID:图片PID】进行搜索(此时，获取图片数量的作用将会是在包含多张图片的PID时获取特定页的图片，且其他的可选变量都将无效)</p><p>7.规则语句会被自动修正，所以您同样可以使用中文标点，如【可莉，兽耳｜泳装】</p><p>8.网站支持一次性获取最多{$maxNumber}张图片，请冲的稍微节制一些(doge)</p><p>9.网站支持添加以下GET参数：<ul><li>Proxy：Pixiv反代地址</li><li>Size：图片大小，你可以使用值\"original\"以获取原图</li><li>ShowTags：显示tag数量，你可以使用值\"0\"以获取全部Tag</li></ul>{$help}</p><p>目前可以透露的情报：</p><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=f973f61b-912b-4dd6-b00a-f9c52db92918&amp;attribution=false'></iframe><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=b23a40a5-8c50-48ae-a950-95c81f9b013c&amp;attribution=false'></iframe>{$R18Info}</div></div></div><script>document.getElementById(\"here\").innerHTML = window.location.href;</script></body></html>";
     };
 }else{
-    if ($license == $setLicense){
-        $before = ['，', '｜', 'uid', 'pid', '：'];
-        $after = [',', '|', 'UID', 'PID', ':'];
-        foreach ($before as $key => $value) $keyword = str_replace($value, $after[$key], $keyword);
-        if (substr($keyword , 0 , 4) == 'PID:'){
-            $pid = intval(str_replace('PID:', null, $keyword));
-            $setuGet = setuGet($pid, $number);
-            $setuDownload = urlencode(json_encode(['pid' => $setuGet['pid'], 'p' => $setuGet['p']]));
-            $htmlSetu = "<div class='notice'><p>PID：{$setuGet['pid']}(第{$setuGet['p']}页)&ensp;<a href='JavaScript:download()'><button id='download'>下载原图</button></a></p><img src='{$setuGet['url']}' width='100%'/></div><br>";
-            goto printSetu;
-        };
-        if (strstr($keyword, ',') || strstr($keyword, '|')){
-            $postValue = explode(',', $keyword);
-            $postKey = 'tag';
-        }elseif (substr($keyword , 0 , 4) == 'UID:'){
-            $postValue = intval(str_replace('UID:', null, $keyword));
-            $postKey = 'uid';
-        }else{
-            $postValue = $keyword;
-            $postKey = 'keyword';
-        };
-        if ($number >= $maxNumber){
-            $number = $maxNumber;
-        }elseif (!$number){
-            $number = 1;
-        };
-        $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => json_encode([$postKey => $postValue, 'r18' => $r18, 'num' => $number, 'proxy' => $setProxy, 'size' => $setSize]), 'timeout' => 60]]);
-        $json = file_get_contents('https://api.lolicon.app/setu/v2', false, $context);
-        $array = json_decode($json, true)['data'];
-        $r18X = "r18Check".$r18;
-        $$r18X = "checked='checked' ";
-        if ($over18 != -1 || $verifyR18 == false) $chooseR18 = "<br>全年龄<input id='radio' type='radio' {$r18Check0}name='r18' value='0'>&emsp;&emsp;R18<input id='radio' type='radio' {$r18Check1}name='r18' value='1'>&emsp;&emsp;随机<input id='radio' type='radio' {$r18Check2}name='r18' value='2'>";
-        if ($array == array()){
-            if ($over18 != -1 || $verifyR18 == false) $setuMode = "<br>是否为R18图：NULL";
-            $htmlSetu = "<div class='notice'><p>标题：NULL<br>画师：NULL<br>PID：NULL{$setuMode}<br>图片Tag：NULL<br></p><p>404 Not Found</p></div><br>";
-        }else{
-            foreach ($array as $setuKey => $setuArray){
-                if ($number != 1) $setuNum = "【".($setuKey + 1)."】";
-                $setuURL = $setuArray['urls'][$setSize];
-                $setuTitle = "标题{$setuNum}：".$setuArray['title']."<br>画师：".$setuArray['author']."(".$setuArray['uid'].")<br>PID：".$setuArray['pid']."(第".($setuArray['p'] + 1)."页)";
-                $setuDownload = urlencode(json_encode(['pid' => $setuArray['pid'], 'p' => ($setuArray['p'] + 1)]));
-                if ($over18 != -1 || $verifyR18 == false) $setuMode = "<br>是否为R18图：".var_export($setuArray['r18'], true);
-                $setuTag = "图片Tag：";
-                foreach ($setuArray['tags'] as $key => $value){
-                    if ($setShowTags == 0) $setShowTags = count($setuArray['tags']);
-                    if ($key < ($setShowTags - 1)){
-                        $setuTag = $setuTag.$value.", ";
-                    }else{
-                        $setuTag = $setuTag.$value."...";
-                        break;
-                    };
-                };
-                $htmlSetu = $htmlSetu."<div class='notice'><p>{$setuTitle}&ensp;<a href='JavaScript:download()'><button id='download'>下载原图</button></a>{$setuMode}<br>{$setuTag}<br></p><img src='{$setuURL}' width='100%'/></div><br>";
+    if ($license != $setLicense) htmlAlert("警告：内部许可码错误！");
+    $before = ['，', '｜', 'uid', 'pid', '：'];
+    $after = [',', '|', 'UID', 'PID', ':'];
+    foreach ($before as $key => $value) $keyword = str_replace($value, $after[$key], $keyword);
+    if (substr($keyword , 0 , 4) == 'PID:'){
+        $pid = intval(str_replace('PID:', null, $keyword));
+        $setuGet = setuGet($pid, $number);
+        $setuDownload = urlencode(json_encode(['pid' => $setuGet['pid'], 'p' => $setuGet['p']]));
+        $htmlSetu = "<div class='notice'><p>PID：{$setuGet['pid']}(第{$setuGet['p']}页)&ensp;<a href='JavaScript:download()'><button id='download'>下载原图</button></a></p><img src='{$setuGet['url']}' width='100%'/></div><br>";
+        goto printSetu;
+    };
+    if (strstr($keyword, ',') || strstr($keyword, '|')){
+        $postValue = explode(',', $keyword);
+        $postKey = 'tag';
+    }elseif (substr($keyword , 0 , 4) == 'UID:'){
+        $postValue = intval(str_replace('UID:', null, $keyword));
+        $postKey = 'uid';
+    }else{
+        $postValue = $keyword;
+        $postKey = 'keyword';
+    };
+    if ($number >= $maxNumber){
+        $number = $maxNumber;
+    }elseif (!$number){
+        $number = 1;
+    };
+    $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => json_encode([$postKey => $postValue, 'r18' => $r18, 'num' => $number, 'proxy' => $setProxy, 'size' => $setSize]), 'timeout' => 60]]);
+    $json = file_get_contents('https://api.lolicon.app/setu/v2', false, $context);
+    $array = json_decode($json, true)['data'];
+    if ($over18 == -1 && in_array('R-18', $array)){
+        $htmlSetu = "<div class='notice'><p>标题：NULL<br>画师：NULL<br>PID：NULL<br>图片Tag：NULL<br></p><p>403 Forbidden</p></div><br>";
+        goto printSetu;
+    };
+    $r18X = "r18Check".$r18;
+    $$r18X = "checked='checked' ";
+    if ($over18 != -1) $chooseR18 = "<br>全年龄<input id='radio' type='radio' {$r18Check0}name='r18' value='0'>&emsp;&emsp;R18<input id='radio' type='radio' {$r18Check1}name='r18' value='1'>&emsp;&emsp;随机<input id='radio' type='radio' {$r18Check2}name='r18' value='2'>";
+    if ($array == array()){
+        if ($over18 != -1) $setuMode = "<br>是否为R18图：NULL";
+        $htmlSetu = "<div class='notice'><p>标题：NULL<br>画师：NULL<br>PID：NULL{$setuMode}<br>图片Tag：NULL<br></p><p>404 Not Found</p></div><br>";
+        goto printSetu;
+    };
+    foreach ($array as $setuKey => $setuArray){
+        if ($number != 1) $setuNum = "【".($setuKey + 1)."】";
+        $setuURL = $setuArray['urls'][$setSize];
+        $setuTitle = "标题{$setuNum}：".$setuArray['title']."<br>画师：".$setuArray['author']."(".$setuArray['uid'].")<br>PID：".$setuArray['pid']."(第".($setuArray['p'] + 1)."页)";
+        $setuDownload = urlencode(json_encode(['pid' => $setuArray['pid'], 'p' => ($setuArray['p'] + 1)]));
+        if ($over18 != -1) $setuMode = "<br>是否为R18图：".var_export($setuArray['r18'], true);
+        $setuTag = "图片Tag：";
+        foreach ($setuArray['tags'] as $key => $value){
+            if ($setShowTags == 0) $setShowTags = count($setuArray['tags']);
+            if ($key < ($setShowTags - 1)){
+                $setuTag .= $value.", ";
+            }else{
+                if ($setShowTags != 0) $setuTagEnd = "...";
+                $setuTag .= $value.$setuTagEnd;
+                break;
             };
         };
-        printSetu:
-        $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'>{$chooseR18}<br>获取图片数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张<input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div><script>function download(){alert('正在唤起浏览器下载器...');location.href='?download={$setuDownload}';}</script></body><html>";
-    }else{
-        htmlAlert("警告：内部许可码错误！");
+        $htmlSetu .= "<div class='notice'><p>{$setuTitle}&ensp;<a href='JavaScript:download()'><button id='download'>下载原图</button></a>{$setuMode}<br>{$setuTag}<br></p><img src='{$setuURL}' width='100%'/></div><br>";
     };
+    printSetu:
+    $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'>{$chooseR18}<br>获取图片数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张<input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div><script>function download(){alert('正在唤起浏览器下载...');location.href='?download={$setuDownload}';}</script></body><html>";
 };
 print_r($htmlDoc);
+exit;
 ?>
