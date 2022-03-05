@@ -12,18 +12,6 @@ $htmlBgOpacity = 0.9;//自定义背景透明度，区间为0-1，0为完全透�
 $htmlIcon = './icon.ico';//自定义网站的图标
 $allowIP = [];//限制可以访问的IP，若填写该项，将只有被允许的IP能够访问此页面
 
-function post($data){
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Content-Length: '.strlen($data)));
-    curl_setopt($ch, CURLOPT_URL, 'https://api.lolicon.app/setu/v2');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_POST, 1);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    $result = curl_exec($ch);
-    curl_close($ch);
-    return(json_decode($result, true));
-};
-
 function htmlHeader($page){
     global $keyword, $over18, $htmlBackground, $htmlBgBlur, $htmlBgOpacity, $htmlIcon;
     if ($keyword != null) $title = " | \"{$keyword}\"的搜索结果";
@@ -34,12 +22,10 @@ function htmlHeader($page){
     };
     return("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0{$title}</title><link href='{$htmlIcon}' rel='icon' type='image/x-icon' /><script>(new Image).src='{$htmlBackground}';</script><style>.overlay{z-index:2;display:flex;align-items:center;justify-content:center;}.overlay:before{background:url({$htmlBackground}) no-repeat;background-size:cover;background-position:center 0;width:100%;height:100%;content:\"\";position:absolute;top:0;left:0;z-index:-1;-webkit-filter:blur(3px);filter:blur({$htmlBgBlur}px);opacity:{$htmlBgOpacity};margin:0;padding:0;position:fixed;}.text-bg{background-color:rgba(255, 255, 255, 0.6);padding:24px;}.input_control{width:360px;margin:20px auto;}{$note}");
 };
-
 function htmlAlert($info){
     print_r("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url='><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title></head><body><script>alert('{$info}');</script></body></html>");
     exit;
 };
-
 $asked = (bool)$_POST['asked'];
 $keyword = strval($_POST['keyword']);
 $license = strval($_POST['license']);
@@ -92,8 +78,9 @@ if (!$asked){
         }elseif (!$number){
             $number = 1;
         };
-        $data = [$postKey => $postValue, 'r18' => $r18, 'num' => $number, 'proxy' => $setProxy, 'size' => $setSize];
-        $array = post(json_encode($data))['data'];
+        $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => json_encode([$postKey => $postValue, 'r18' => $r18, 'num' => $number, 'proxy' => $setProxy, 'size' => $setSize]), 'timeout' => 60]]);
+        $json = file_get_contents('https://api.lolicon.app/setu/v2', false, $context);
+        $array = json_decode($json, true)['data'];
         $r18X = "r18Check".$r18;
         $$r18X = "checked='checked' ";
         if ($over18 != -1 || $verifyR18 == false) $chooseR18 = "<br>全年龄<input id='radio' type='radio' {$r18Check0}name='r18' value='0'>&emsp;&emsp;R18<input id='radio' type='radio' {$r18Check1}name='r18' value='1'>&emsp;&emsp;随机<input id='radio' type='radio' {$r18Check2}name='r18' value='2'>";
