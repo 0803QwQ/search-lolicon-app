@@ -150,10 +150,10 @@ if (!$asked){
                 break;
             };
         };
-        $htmlSetu .= "<div class='notice'><p>{$setuTitle}&ensp;<a href='JavaScript:download()'><button id='download'>下载原图</button></a>{$setuMode}<br>{$setuTag}<br></p><img src='{$setuURL}' width='100%'/></div><br>";
+        $htmlSetu .= "<div class='notice'><p>{$setuTitle}&ensp;<a href='JavaScript:download({$setuDownload})'><button id='download'>下载原图</button></a>{$setuMode}<br>{$setuTag}<br></p><img src='{$setuURL}' width='100%'/></div><br>";
     };
     printSetu:
-    $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'>{$chooseR18}<br>获取图片数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张<input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div><script>function download(){alert('正在唤起浏览器下载...');location.href='?download={$setuDownload}';}</script></body><html>";
+    $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'>{$chooseR18}<br>获取图片数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张<input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div><script>function download(info){alert('正在唤起浏览器下载...');location.href='?download={info}';}</script></body><html>";
 };
 print_r($htmlDoc);
 exit;
