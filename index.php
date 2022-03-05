@@ -121,10 +121,6 @@ if (!$asked){
     $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => json_encode([$postKey => $postValue, 'r18' => $r18, 'num' => $number, 'proxy' => $setProxy, 'size' => $setSize]), 'timeout' => 60]]);
     $json = file_get_contents('https://api.lolicon.app/setu/v2', false, $context);
     $array = json_decode($json, true)['data'];
-    if ($over18 == -1 && in_array('R-18', $array)){
-        $htmlSetu = "<div class='notice'><p>标题：NULL<br>画师：NULL<br>PID：NULL<br>图片Tag：NULL<br></p><p>403 Forbidden</p></div><br>";
-        goto printSetu;
-    };
     $r18X = "r18Check".$r18;
     $$r18X = "checked='checked' ";
     if ($over18 != -1) $chooseR18 = "<br>全年龄<input id='radio' type='radio' {$r18Check0}name='r18' value='0'>&emsp;&emsp;R18<input id='radio' type='radio' {$r18Check1}name='r18' value='1'>&emsp;&emsp;随机<input id='radio' type='radio' {$r18Check2}name='r18' value='2'>";
@@ -134,6 +130,10 @@ if (!$asked){
         goto printSetu;
     };
     foreach ($array as $setuKey => $setuArray){
+        if ($over18 == -1 && in_array('R-18', $setuArray['tags'])){
+            $htmlSetu .= "<div class='notice'><p>标题：NULL<br>画师：NULL<br>PID：NULL<br>图片Tag：NULL<br></p><p>403 Forbidden</p></div><br>";
+            continue;
+        };
         if ($number != 1) $setuNum = "【".($setuKey + 1)."】";
         $setuURL = $setuArray['urls'][$setSize];
         $setuTitle = "标题{$setuNum}：".$setuArray['title']."<br>画师：".$setuArray['author']."(".$setuArray['uid'].")<br>PID：".$setuArray['pid']."(第".($setuArray['p'] + 1)."页)";
