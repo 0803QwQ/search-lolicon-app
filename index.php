@@ -66,14 +66,14 @@ if ($_GET['download'] != null){
         $setuGetURL = $setuIpInfo['url'];
     }else{
         $setuGetURL = setuGet($setuIpInfo['pid'], $setuIpInfo['p'])['url'];
-        if (!$setuGet['url']) exit;
+        if (!$setuGetURL) exit;
     };
     header('Content-Type: application/force-download');
     header('Content-Disposition: attachment; filename="'.basename($setuGetURL).'"');
     header('Content-Transfer-Encoding: binary');
     header('Connection: close');
     readfile($setuGetURL);
-    die();
+    exit;
 };
 unset($_GET['download']);
 $setBefore = ['license', 'proxy','pixivapi', 'size', 'showtags'];
