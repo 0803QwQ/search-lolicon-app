@@ -24,20 +24,20 @@ function htmlHeader($page){
     return("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0{$title}</title><link href='{$htmlIcon}' rel='icon' type='image/x-icon' /><style>.overlay{z-index:2;display:flex;align-items:center;justify-content:center;}.overlay:before{background:url({$htmlBackground}) no-repeat;background-size:cover;background-position:center 0;width:100%;height:100%;content:\"\";position:absolute;top:0;left:0;z-index:-1;-webkit-filter:blur(3px);filter:blur({$htmlBgBlur}px);opacity:{$htmlBgOpacity};margin:0;padding:0;position:fixed;}.text-bg{background-color:rgba(255, 255, 255, 0.6);padding:24px;}.input_control{width:360px;margin:20px auto;}.dlbg{z-index:3;position:fixed;bottom:1px;right:1px;}#imgLayer{display:none;z-index:4;position:fixed;width:100%;height:100%;background:rgba(0,0,0,0.6);top:50%;left:50%;transform:translateX(-50%) translateY(-50%);}#imgBoxl{display:none;height:100%;z-index:5;position:fixed;margin:5%;}#bigimg{position:fixed;top:50%;left:50%;transform:translateX(-50%) translateY(-50%);}button[id='download']{color:rgb(0, 0, 0);border:2px solid rgb(0, 0, 0);cursor:pointer;}{$note}");
 };
 function htmlAlert($info){
-    print_r("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url='><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title></head><body><script>alert('{$info}');</script></body></html>");
-    exit;
+    global $htmlIcon;
+    return(print_r("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url='><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title><link href='{$htmlIcon}' rel='icon' type='image/x-icon' /></head><body><script>alert('{$info}');</script></body></html>"));
 };
 function setuGet($pid, $p){
     global $setPixivAPI;
     $url = "http://{$setPixivAPI}/{$pid}";
     $fileTypeArray = ['jpg', 'png', 'gif'];
     foreach ($fileTypeArray as $fileType){
-        if (@file_get_contents($url."-{$p}.{$fileType}")){
+        if (!strstr(get_headers($url."-{$p}.{$fileType}", 1)[0], '404')){
             $url .= "-{$p}.{$fileType}";
-        }elseif (@file_get_contents($url."-1.{$fileType}")){
+        }elseif (!strstr(get_headers($url."-1.{$fileType}", 1)[0], '404')){
             $p = 1;
             $url .= "-1.{$fileType}";
-        }elseif (@file_get_contents($url.".{$fileType}")){
+        }elseif (!strstr(get_headers($url.".{$fileType}", 1)[0], '404')){
             $p = 1;
             $url .= ".{$fileType}";
         }else{
@@ -55,20 +55,27 @@ $r18 = intval($_POST['r18']);
 $number = intval($_POST['number']);
 if ($hideR18 == true){
     $over18 = -1;
+}elseif ($verifyR18 == false){
+    $over18 = 1;
 }else{
     $over18 = intval($_POST['over18']);
 };
 if ($_GET['download'] != null){
     $setuIpInfo = json_decode(urldecode($_GET['download']), true);
-    $setuGet = setuGet($setuIpInfo['pid'], $setuIpInfo['p']);
-    if (!$setuGet['url']) exit;
+    if ($setuIpInfo['url'] != null){
+        $setuGetURL = $setuIpInfo['url'];
+    }else{
+        $setuGetURL = setuGet($setuIpInfo['pid'], $setuIpInfo['p'])['url'];
+        if (!$setuGet['url']) exit;
+    };
     header('Content-Type: application/force-download');
-    header('Content-Disposition: attachment; filename="'.basename($setuGet['url']).'"');
+    header('Content-Disposition: attachment; filename="'.basename($setuGetURL).'"');
     header('Content-Transfer-Encoding: binary');
     header('Connection: close');
-    readfile($setuGet['url']);
-    exit;
+    readfile($setuGetURL);
+    die();
 };
+unset($_GET['download']);
 $setBefore = ['license', 'proxy','pixivapi', 'size', 'showtags'];
 $setAfter = ['License', 'Proxy','PixivAPI', 'Size', 'ShowTags'];
 foreach ($_GET as $setKey => $setValue){
@@ -81,7 +88,11 @@ foreach ($_GET as $setKey => $setValue){
     };
 };
 if ($allowIP != array() && !in_array($_SERVER['REMOTE_ADDR'], $allowIP)) htmlAlert("警告：访问IP未经授权！");
-$htmlEnd = "<div id='dlbg' class='dlbg'><a href=\"JavaScript:openBg()\"><button id='download'>获取背景</button></a></div><div id='imgLayer' onclick=\"closeBg()\"></div><div id='imgBoxl' class='modal'><img id='bigimg' src='{$htmlBackground}' title='长按/右键图片以保存\n点击空白处以关闭'></div><script>function openBg(){var imgLayer=document.getElementById(\"imgLayer\");var imgBoxl=document.getElementById(\"imgBoxl\");imgLayer.style.display=\"block\";imgBoxl.style.display=\"block\";imgSg();};function closeBg(){var imgLayer=document.getElementById(\"imgLayer\");var imgBoxl=document.getElementById(\"imgBoxl\");imgLayer.style.display=\"none\";imgBoxl.style.display=\"none\";};function imgSg(){var img=document.getElementById(\"bigimg\");var imgw=img.naturalWidth;var imgh=img.naturalHeight;var userw=document.body.clientWidth;var userh=document.body.clientHeight;if (imgw>=(userw * 0.8) && imgh<=(userh * 0.8)){img.style.width=\"80%\";img.style.height=\"auto\";}else if (imgh>=(userh * 0.8)){img.style.width=\"auto\";img.style.height=\"80%\";}else{img.style.width=\"auto\";img.style.height=\"auto\";};};</script></body></html>";
+$htmlBgHeader = get_headers($htmlBackground, 1);
+if ($htmlBgHeader['Location'] != null) $htmlBackground = $htmlBgHeader['Location'];
+if ($htmlBgHeader['location'] != null) $htmlBackground = $htmlBgHeader['location'];
+$bgDownload = urlencode(json_encode(['url' => $htmlBackground]));
+$htmlEnd = "<div id='dlbg' class='dlbg'><a href=\"JavaScript:openBg()\"><button id='download'>获取背景</button></a></div><div id='imgLayer' onclick=\"closeBg()\"></div><div id='imgBoxl' class='modal'><a href=\"JavaScript:download('{$bgDownload}')\"><img id='bigimg' src='{$htmlBackground}' title='点击图片以保存\n点击空白处以关闭' /></a></div><script>function download(info){alert('正在唤起浏览器下载...');location.href='?download='+info;};function openBg(){var imgLayer=document.getElementById(\"imgLayer\");var imgBoxl=document.getElementById(\"imgBoxl\");imgLayer.style.display=\"block\";imgBoxl.style.display=\"block\";imgSg();};function closeBg(){var imgLayer=document.getElementById(\"imgLayer\");var imgBoxl=document.getElementById(\"imgBoxl\");imgLayer.style.display=\"none\";imgBoxl.style.display=\"none\";};function imgSg(){var img=document.getElementById(\"bigimg\");var imgw=img.naturalWidth;var imgh=img.naturalHeight;var userw=document.body.clientWidth;var userh=document.body.clientHeight;if (imgw>=(userw * 0.8) && imgh<=(userh * 0.8)){img.style.width=\"80%\";img.style.height=\"auto\";}else if (imgh>=(userh * 0.8)){img.style.width=\"auto\";img.style.height=\"80%\";}else{img.style.width=\"auto\";img.style.height=\"auto\";};};</script></body></html>";
 if (!$asked){
     if ($verifyR18 == true && !$over18){
         $htmlDoc = htmlHeader("verifyR18").$htmlEnd;
@@ -168,8 +179,7 @@ if (!$asked){
         $htmlSetu .= "<div class='notice'><p>{$setuOpInfo}&ensp;<a href=\"JavaScript:download('{$setuDownload}')\"><button id='download'>下载原图</button></a>{$setuMode}<br>{$setuTag}<br></p><img src='{$setuURL}' width='100%'/></div><br>";
     };
     printSetu:
-    $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'><br>{$chooseR18}获取<span id='numberInfo'>{$numberInfo}</span><input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div><script>var background=new Image();background.src='{$htmlBackground}';function download(info){alert('正在唤起浏览器下载...');location.href='?download='+info;};function radioCheck1(){document.getElementById('numberInfo').innerHTML=\"数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张\";};function radioCheck2(){document.getElementById('numberInfo').innerHTML=\"页码：<input id='number' type='number' name='number' value='{$number}' min='1' max='2147483647' />页\";};</script>".$htmlEnd;
+    $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'><br>{$chooseR18}获取<span id='numberInfo'>{$numberInfo}</span><input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div><script>var background=new Image();background.src='{$htmlBackground}';function radioCheck1(){document.getElementById('numberInfo').innerHTML=\"数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张\";};function radioCheck2(){document.getElementById('numberInfo').innerHTML=\"页码：<input id='number' type='number' name='number' value='{$number}' min='1' max='2147483647' />页\";};</script>".$htmlEnd;
 };
-print_r($htmlDoc);
-exit;
+return(print_r($htmlDoc));
 ?>
