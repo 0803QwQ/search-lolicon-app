@@ -32,12 +32,12 @@ function setuGet($pid, $p){
     $url = "http://{$setPixivAPI}/{$pid}";
     $fileTypeArray = ['jpg', 'png', 'gif'];
     foreach ($fileTypeArray as $fileType){
-        if (!strstr(get_headers($url."-{$p}.{$fileType}", 1)[0], '404')){
+        if (@file_get_contents($url."-{$p}.{$fileType}")){
             $url .= "-{$p}.{$fileType}";
-        }elseif (!strstr(get_headers($url."-1.{$fileType}", 1)[0], '404')){
+        }elseif (@file_get_contents($url."-1.{$fileType}")){
             $p = 1;
             $url .= "-1.{$fileType}";
-        }elseif (!strstr(get_headers($url.".{$fileType}", 1)[0], '404')){
+        }elseif (@file_get_contents($url.".{$fileType}")){
             $p = 1;
             $url .= ".{$fileType}";
         }else{
