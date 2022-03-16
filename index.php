@@ -30,7 +30,7 @@ function htmlAlert($info){
 function setuGet($pid, $p){
     global $setPixivAPI;
     $url = "http://{$setPixivAPI}/{$pid}";
-    $fileTypeArray = ['jpg', 'png', 'gif'];
+    $fileTypeArray = ['png', 'jpg', 'gif'];
     foreach ($fileTypeArray as $fileType){
         if (@file_get_contents($url."-{$p}.{$fileType}")){
             $url .= "-{$p}.{$fileType}";
@@ -92,7 +92,7 @@ $htmlBgHeader = get_headers($htmlBackground, 1);
 if ($htmlBgHeader['Location'] != null) $htmlBackground = $htmlBgHeader['Location'];
 if ($htmlBgHeader['location'] != null) $htmlBackground = $htmlBgHeader['location'];
 $bgDownload = urlencode(json_encode(['url' => $htmlBackground]));
-$htmlEnd = "<div id='dlbg' class='dlbg'><a href=\"JavaScript:openBg()\"><button id='download'>获取背景</button></a></div><div id='imgLayer' onclick=\"closeBg()\"></div><div id='imgBoxl' class='modal'><a href=\"JavaScript:download('{$bgDownload}')\"><img id='bigimg' src='{$htmlBackground}' title='点击图片以保存\n点击空白处以关闭' /></a></div><script>function download(info){alert('正在唤起浏览器下载...');location.href='?download='+info;};function openBg(){var imgLayer=document.getElementById(\"imgLayer\");var imgBoxl=document.getElementById(\"imgBoxl\");imgLayer.style.display=\"block\";imgBoxl.style.display=\"block\";imgSg();};function closeBg(){var imgLayer=document.getElementById(\"imgLayer\");var imgBoxl=document.getElementById(\"imgBoxl\");imgLayer.style.display=\"none\";imgBoxl.style.display=\"none\";};function imgSg(){var img=document.getElementById(\"bigimg\");var imgw=img.naturalWidth;var imgh=img.naturalHeight;var userw=document.body.clientWidth;var userh=document.body.clientHeight;if (imgw>=(userw * 0.8) && imgh<=(userh * 0.8)){img.style.width=\"80%\";img.style.height=\"auto\";}else if (imgh>=(userh * 0.8)){img.style.width=\"auto\";img.style.height=\"80%\";}else{img.style.width=\"auto\";img.style.height=\"auto\";};};</script></body></html>";
+$htmlEnd = "<div id='dlbg' class='dlbg'><a href=\"JavaScript:openBg()\"><button id='download'>获取背景</button></a></div><div id='imgLayer' onclick=\"closeBg()\"></div><div id='imgBoxl' class='modal'><a href=\"JavaScript:download('{$bgDownload}')\"><img id='bigimg' src='{$htmlBackground}' title='点击图片以保存\n点击空白处以关闭'/></a></div><script>function download(info){alert('正在唤起浏览器下载...');location.href='?download='+info;};function openBg(){var imgLayer=document.getElementById(\"imgLayer\");var imgBoxl=document.getElementById(\"imgBoxl\");imgLayer.style.display=\"block\";imgBoxl.style.display=\"block\";imgSg();};function closeBg(){var imgLayer=document.getElementById(\"imgLayer\");var imgBoxl=document.getElementById(\"imgBoxl\");imgLayer.style.display=\"none\";imgBoxl.style.display=\"none\";};function imgSg(){var img=document.getElementById(\"bigimg\");var imgw=img.naturalWidth;var imgh=img.naturalHeight;var userw=document.body.clientWidth;var userh=document.body.clientHeight;if (imgw>=(userw * 0.8) && imgh<=(userh * 0.8)){img.style.width=\"80%\";img.style.height=\"auto\";}else if (imgh>=(userh * 0.8)){img.style.width=\"auto\";img.style.height=\"80%\";}else{img.style.width=\"auto\";img.style.height=\"auto\";};};</script></body></html>";
 if (!$asked){
     if ($verifyR18 == true && !$over18){
         $htmlDoc = htmlHeader("verifyR18").$htmlEnd;
@@ -104,7 +104,8 @@ if (!$asked){
         }else{
             $pidInfo = "【数据删除】";
         };
-        $htmlDoc = htmlHeader("license")."<input id='license' type='password' name='license' placeholder='请输入内部许可码'><input id='submit' type='submit' value='Link Start !',name='submit'></form></h3><div class='notice'><p><b>欢迎使用Lolicon.App涩图检索工具2.0！</b></p><p>请阅读以下说明:</p><p>搜索时支持AND和OR规则，方法如下:</p><p>1.你可以使用逗号【,】来获取包含特定多个tag的涩图(最多3个)，如【可莉,白丝】</p><p>2.你可以使用分割符【|】来获取包含任意一个tag的涩图(最多20个)，如【黑丝|白丝|萝莉】</p>3.你可以两者混用，如【可莉,黑丝|白丝】</p><p>4.如果你只搜索一个关键词，网站将会在标题/Tag/画师中进行模糊搜索</p><p>5.网站也支持搜索特定画师的涩图，你可以使用类似如下语句【UID:画师UID】进行搜索(注意这种搜索方式不能包含其他关键词)</p><p>6.{$pidInfo}</p><p>7.规则语句会被自动修正，所以您同样可以使用中文标点，如【可莉，兽耳｜泳装】</p><p>8.网站支持一次性获取最多{$maxNumber}张图片，请冲的稍微节制一些(doge)</p><p>9.网站支持添加以下GET参数：<ul><li>Proxy：Pixiv反代地址</li><li>PixivAPI：Pixiv原图下载API</li><li>Size：图片大小，你可以使用值\"original\"以获取原图</li><li>ShowTags：显示tag数量，你可以使用值\"0\"以获取全部Tag</li></ul>{$help}</p><p>目前可以透露的情报：</p><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=f973f61b-912b-4dd6-b00a-f9c52db92918&amp;attribution=false'></iframe><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=b23a40a5-8c50-48ae-a950-95c81f9b013c&amp;attribution=false'></iframe>{$R18Info}</div></div></div><script>document.getElementById(\"here\").innerHTML = window.location.href;</script>".$htmlEnd;
+        if ($setLicense != "") $htmlLicense = "<input id='license' type='password' name='license' placeholder='请输入内部许可码'>";
+        $htmlDoc = htmlHeader("license")."{$htmlLicense}<input id='submit' type='submit' value='Link Start !',name='submit'></form></h3><div class='notice'><p><b>欢迎使用Lolicon.App涩图检索工具2.0！</b></p><p>请阅读以下说明:</p><p>搜索时支持AND和OR规则，方法如下:</p><p>1.你可以使用逗号【,】来获取包含特定多个tag的涩图(最多3个)，如【可莉,白丝】</p><p>2.你可以使用分割符【|】来获取包含任意一个tag的涩图(最多20个)，如【黑丝|白丝|萝莉】</p>3.你可以两者混用，如【可莉,黑丝|白丝】</p><p>4.如果你只搜索一个关键词，网站将会在标题/Tag/画师中进行模糊搜索</p><p>5.网站也支持搜索特定画师的涩图，你可以使用类似如下语句【UID:画师UID】进行搜索(注意这种搜索方式不能包含其他关键词)</p><p>6.{$pidInfo}</p><p>7.规则语句会被自动修正，所以您同样可以使用中文标点，如【可莉，兽耳｜泳装】</p><p>8.网站支持一次性获取最多{$maxNumber}张图片，请冲的稍微节制一些(doge)</p><p>9.网站支持添加以下GET参数：<ul><li>Proxy：Pixiv反代地址</li><li>PixivAPI：Pixiv原图下载API</li><li>Size：图片大小，你可以使用值\"original\"以获取原图</li><li>ShowTags：显示tag数量，你可以使用值\"0\"以获取全部Tag</li></ul>{$help}</p><p>目前可以透露的情报：</p><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=f973f61b-912b-4dd6-b00a-f9c52db92918&amp;attribution=false'></iframe><iframe width='100%' src='https://charts.mongodb.com/charts-setu-api-qxdzw/embed/charts?id=b23a40a5-8c50-48ae-a950-95c81f9b013c&amp;attribution=false'></iframe>{$R18Info}</div></div></div><script>document.getElementById(\"here\").innerHTML = window.location.href;</script>".$htmlEnd;
     };
 }else{
     if ($license != $setLicense) htmlAlert("警告：内部许可码错误！");
@@ -144,8 +145,7 @@ if (!$asked){
         $postKey = 'keyword';
     };
     $context = stream_context_create(['http' => ['method' => 'POST', 'header' => 'Content-Type: application/json', 'content' => json_encode([$postKey => $postValue, 'r18' => $r18, 'num' => $number, 'proxy' => $setProxy, 'size' => $setSize]), 'timeout' => 60]]);
-    $json = file_get_contents('https://api.lolicon.app/setu/v2', false, $context);
-    $array = json_decode($json, true)['data'];
+    $array = json_decode(file_get_contents('https://api.lolicon.app/setu/v2', false, $context), true)['data'];
     if ($array == array()){
         if ($over18 != -1) $setuMode = "<br>是否为R18图：NULL";
         $htmlSetu = "<div class='notice'><p>标题：NULL<br>画师：NULL<br>PID：NULL(第NULL页){$setuMode}<br>图片Tag：NULL<br></p><p>404 Not Found</p></div><br>";
