@@ -25,7 +25,7 @@ function htmlHeader($page){
 };
 function htmlAlert($info){
     global $htmlIcon;
-    return(print_r("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url='><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title><link href='{$htmlIcon}' rel='icon' type='image/x-icon' /></head><body><script>alert('{$info}');</script></body></html>"));
+    die("<html><head><meta http-equiv'Content-Type' content='text/html; charset=utf-8'><meta name='viewport' content='width=device-width,maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'><meta http-equiv='refresh' content='0; url='><title>Search in the Lolicon.App V2 - Lolicon.App涩图检索工具2.0</title><link href='{$htmlIcon}' rel='icon' type='image/x-icon' /></head><body><script>alert('{$info}');</script></body></html>");
 };
 function setuGet($pid, $p){
     global $setPixivAPI;
@@ -59,9 +59,9 @@ function isTencentAppBrowser(){
 };
 $iTAB = isTencentAppBrowser();
 if ($iTAB == "WPBrowser" && !$_POST['WPBrowser']){
-    return(print_r("<font size='6'><b>提示：<br>您使用的可能是Windows Phone平台，我们无法判断您的浏览器，请确保您是使用非国产软件内置浏览器访问的本页面后点击<form method='post'><button name='WPBrowser' value='true'>继续</button><form>；亦或者，如果您使用的是国产软件内置浏览器，请点击右上角的“···”按钮选择“在默认浏览器中打开”，谢谢</b></font>"));
+    die("<font size='6'><b>提示：<br>您使用的可能是Windows Phone平台，我们无法判断您的浏览器，请确保您是使用非国产软件内置浏览器访问的本页面后点击<form method='post'><button name='WPBrowser' value='true'>继续</button><form>；亦或者，如果您使用的是国产软件内置浏览器，请点击右上角的“···”按钮选择“在默认浏览器中打开”，谢谢</b></font>");
 }elseif (in_array($iTAB, ['inWeiXin', 'inQQ'], true)){
-    return(print_r("<font size='6'><b>提示：<br>请使用非国产软件内置浏览器访问本页面，你可以点击右上角的“···”按钮选择“在默认浏览器中打开”，谢谢</b></font>"));
+    die("<font size='6'><b>提示：<br>请使用非国产软件内置浏览器访问本页面，你可以点击右上角的“···”按钮选择“在默认浏览器中打开”，谢谢</b></font>");
 };
 $asked = (bool)$_POST['asked'];
 $keyword = strval($_POST['keyword']);
@@ -81,14 +81,14 @@ if ($_GET['download'] != null){
         $setuGetURL = $setuIpInfo['url'];
     }else{
         $setuGetURL = setuGet($setuIpInfo['pid'], $setuIpInfo['p'])['url'];
-        if (!$setuGetURL) exit;
+        if (!$setuGetURL) die;
     };
     header('Content-Type: application/force-download');
     header('Content-Disposition: attachment; filename="'.basename($setuGetURL).'"');
     header('Content-Transfer-Encoding: binary');
     header('Connection: close');
     readfile($setuGetURL);
-    exit;
+    die;
 };
 unset($_GET['download']);
 $setBefore = ['license', 'proxy','pixivapi', 'size', 'showtags'];
@@ -196,5 +196,5 @@ if (!$asked){
     printSetu:
     $htmlDoc = htmlHeader("keyword")."<input id='license' type='license' name='license' value='{$setLicense}' style='display:none'><input id='keyword' type='keyword' name='keyword' value='{$keyword}' placeholder='请输入搜索关键词'><br>{$chooseR18}获取<span id='numberInfo'>{$numberInfo}</span><input id='submit' type='submit' value='立即搜索',name='submit'></form>{$htmlSetu}</h3></div></div></div><script>var background=new Image();background.src='{$htmlBackground}';function radioCheck1(){document.getElementById('numberInfo').innerHTML=\"数量(1-{$maxNumber})：<input id='number' type='number' name='number' value='{$number}' min='1' max='{$maxNumber}' />张\";};function radioCheck2(){document.getElementById('numberInfo').innerHTML=\"页码：<input id='number' type='number' name='number' value='{$number}' min='1' max='2147483647' />页\";};</script>".$htmlEnd;
 };
-return(print_r($htmlDoc));
+die($htmlDoc);
 ?>
